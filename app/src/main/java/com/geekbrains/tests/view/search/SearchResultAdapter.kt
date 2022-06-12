@@ -1,13 +1,12 @@
 package com.geekbrains.tests.view.search
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.geekbrains.tests.R
+import com.geekbrains.tests.databinding.ListItemBinding
 import com.geekbrains.tests.model.SearchResult
 import com.geekbrains.tests.view.search.SearchResultAdapter.SearchResultViewHolder
-import kotlinx.android.synthetic.main.list_item.view.*
 
 internal class SearchResultAdapter : RecyclerView.Adapter<SearchResultViewHolder>() {
 
@@ -17,9 +16,9 @@ internal class SearchResultAdapter : RecyclerView.Adapter<SearchResultViewHolder
         parent: ViewGroup,
         viewType: Int
     ): SearchResultViewHolder {
-        return SearchResultViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.list_item, null)
-        )
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ListItemBinding.inflate(inflater)
+        return SearchResultViewHolder(binding)
     }
 
     override fun onBindViewHolder(
@@ -33,15 +32,16 @@ internal class SearchResultAdapter : RecyclerView.Adapter<SearchResultViewHolder
         return results.size
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateResults(results: List<SearchResult>) {
         this.results = results
         notifyDataSetChanged()
     }
 
-    internal class SearchResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal class SearchResultViewHolder(private val binding: ListItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(searchResult: SearchResult) {
-            itemView.repositoryName.text = searchResult.fullName
+            binding.repositoryName.text = searchResult.fullName
         }
     }
 }

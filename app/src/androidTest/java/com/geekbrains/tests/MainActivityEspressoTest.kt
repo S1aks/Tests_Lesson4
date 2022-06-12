@@ -11,6 +11,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.geekbrains.tests.view.search.MainActivity
 import org.hamcrest.Matcher
+import org.hamcrest.Matchers.not
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -27,20 +28,45 @@ class MainActivityEspressoTest {
     }
 
     @Test
+    fun searchEditTextIsCorrect() {
+        onView(withId(R.id.searchEditText)).check(matches(isDisplayed()))
+        onView(withId(R.id.searchEditText)).check(matches(withText("")))
+    }
+
+    @Test
+    fun totalCountTextViewIsCorrect() {
+        onView(withId(R.id.totalCountTextView)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.totalCountTextView)).check(matches(withText("Number of results: %d")))
+    }
+
+    @Test
+    fun buttonToDetailsActivityIsCorrect() {
+        onView(withId(R.id.toDetailsActivityButton)).check(matches(isDisplayed()))
+        onView(withId(R.id.toDetailsActivityButton)).check(matches(withText("to details")))
+    }
+
+    @Test
     fun activitySearch_IsWorking() {
         onView(withId(R.id.searchEditText)).perform(click())
         onView(withId(R.id.searchEditText)).perform(replaceText("algol"), closeSoftKeyboard())
         onView(withId(R.id.searchEditText)).perform(pressImeActionButton())
-
-        if (BuildConfig.TYPE == MainActivity.FAKE) {
+        if (BuildConfig.FLAVOR == "fake") {
+            onView(withId(R.id.totalCountTextView)).check(matches(isDisplayed()))
             onView(withId(R.id.totalCountTextView)).check(matches(withText("Number of results: 42")))
         } else {
             onView(isRoot()).perform(delay())
-            onView(withId(R.id.totalCountTextView)).check(matches(withText("Number of results: 2283")))
+            onView(withId(R.id.totalCountTextView)).check(matches(isDisplayed()))
+            onView(withId(R.id.totalCountTextView)).check(matches(withText("Number of results: 2958")))
         }
     }
 
-    private fun delay(): ViewAction? {
+    @Test
+    fun activityGoToDetailsActivity() {
+        onView(withId(R.id.toDetailsActivityButton)).perform(click())
+        onView(isRoot()).perform(delay()).check(matches(isNotFocused()))
+    }
+
+    private fun delay(): ViewAction {
         return object : ViewAction {
             override fun getConstraints(): Matcher<View> = isRoot()
             override fun getDescription(): String = "wait for $2 seconds"
